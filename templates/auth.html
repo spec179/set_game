@@ -32,12 +32,22 @@
 								</div>
 							  </div>
 						  </div>
+						  <div>
+							<label for="inputPassword" class="col-sm-5 col-form-label">
+								<input type="checkbox" name="checkbox" value="newuser">Создать аккаунт</label>
+						  </div>
 						  <div class="modal-footer">
 							<!-- <input type="submit" class="btn btn-secondary" data-dismiss="modal">я новенький!</input> -->
-							<button type="submit" class="btn btn-primary">у меня уже был аккаунт</button> 
+							<button type="submit" class="btn btn-primary">Отправить</button> 
 						  </div>
 						</div>
 					</div>
+					</div>
+					{% for message in messages %}
+					<p class="alert alert-danger" role="alert">
+						{{ message }}
+					</p>
+					{% endfor %}
 				</div>
 			</div>
 		</div>

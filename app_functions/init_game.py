@@ -27,5 +27,5 @@ def run():
     db_sess = db_session.create_session()
     db_sess.add(game)
     db_sess.commit()
-    return 'ABOBA'
+    return True
    
