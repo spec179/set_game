@@ -3,6 +3,9 @@ from flask import render_template
 from flask import redirect
 from flask import request
 
+from flask_login import LoginManager
+from flask_login import login_user
+
 from data import db_session
 from data import users 
 
@@ -42,6 +45,17 @@ def run():
 '''*end*'''
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '179supertop'
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.query(users.User).get(user_id)
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/auth', methods=['GET', 'POST'])
@@ -50,7 +64,7 @@ def login():
         return render_template('auth.html', message='')
     elif request.method == 'POST':
         db_sess = db_session.create_session()
-        if request.form['checkbox']:
+        if request.form.get('checkbox', False):
             if db_sess.query(users.User).filter(users.User.login == request.form['login']).first():
                 return render_template('auth.html',
                                        messages=["Такой пользователь уже есть"])
@@ -58,11 +72,20 @@ def login():
             user.set_password(request.form['password'])
             db_sess.add(user)
             db_sess.commit()
-            print('Sucsessfully registered')
-        # print(request.form['login'])
-        # print(request.form['password'])
-        # здесь должна быть проверка, можно ли авторизовать пользователя
-        return redirect('/game')
+            login_user(user)
+            return redirect("/game")
+        else:
+            user = db_sess.query(users.User).filter(users.User.login == request.form['login']).first()
+            if user and user.check_password(request.form['password']):
+                login_user(user)
+                return redirect("/game")
+            return render_template('auth.html',
+                                   messages=["Неправильный логин или пароль"])
+
+
+@app.route('/game')
+def game():
+    return render_template('set.html')
     
 
 def main():
