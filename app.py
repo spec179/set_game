@@ -8,11 +8,11 @@ from flask_login import login_user
 
 from flask_socketio import SocketIO, emit
 
-from code.data import db_session
-from code.data import users
-from code.data import game as gm
+from codeeee.data import db_session
+from codeeee.data import users
+from codeeee.data import game as gm
 
-from code.app_functions import init_game, check_set, check_set_on_field
+from codeeee.app_functions import init_game, check_set, check_set_on_field
 
 # from .app_functions import init_game
 
