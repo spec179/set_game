@@ -1,4 +1,4 @@
-def check_set_on_field(field):
+def check_exist_set_on_field(field):
     """ field=[card, card, card...] """
     for i in range(len(field)):
         for j in range(i + 1, len(field)):

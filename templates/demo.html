@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Заголовок моей страницы</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Sonsie+One" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../states/css/demo.css" >
+	
+  </head>
+
+  <body>    
+	<div id = "wrap">
+		<header>
+			<h1 class="centrtitle"> SET </h1>
+		</header>
+	</div>
+
+    <main>
+        <aside class="infobox">
+			<h2> справка </h2>
+			<ul class="research">
+            <li>{% if current_user.is_authenticated %}
+				<a class="navbar-brand" href="/logout">{{ current_user.login }}</a>
+			{% else %}
+				<p>
+					<a class="btn btn-success" href="/auth">Войти</a>
+				</p>
+			{% endif %}</li>
+            <li>Лаааадно...</li>
+        </ul>
+        </aside>
+		<div class="game">
+			<div class="colom1">
+				<button type="button" class="card"> Card 1</button>
+				<button type="button" class="card"> Card 2</button>
+				<button type="button" class="card"> Card 3</button>
+				<button type="button" class="card"> Card 4</button>
+			</div>
+			<div class="colom2">	
+				<button type="button" class="card"> Card 5</button>
+				<button type="button" class="card"> Card 6</button>
+				<button type="button" class="card"> Card 7</button>
+				<button type="button" class="card"> Card 8</button>
+			</div>
+			<div class="colom3">				
+				<button type="button" class="card"> Card 9</button>
+				<button type="button" class="card"> Card 10</button>
+				<button type="button" class="card"> Card 11</button>
+				<button type="button" class="card"> Card 12</button>
+			</div>
+		</div>
+    </main>
+
+	<script type="text/javascript" charset="utf-8">
+    
+		var socket = io();
+		var test = io('/set')
+		test.on('connect', function() {
+			test.emit('check_set', {indexes: [0, 1, 2]});
+		});
+		
+	</script>
+
+  </body>
+</html>

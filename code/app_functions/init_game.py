@@ -1,7 +1,8 @@
 from random import shuffle
 import json
-from ..data import db_session
-from ..data import game as gm
+from data import db_session
+from data import game as gm
+from random import randint
 
 
 def run():
@@ -28,4 +29,10 @@ def run():
     db_sess.add(game)
     db_sess.commit()
     return True
-   
+
+
+def new_card():
+    return {"color": randint(0, 2),
+            "shape": randint(0, 2),
+            "number": randint(0, 2),
+            "fill": randint(0, 2)}
