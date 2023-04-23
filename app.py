@@ -71,9 +71,9 @@ def handler_set(data):
     """data list of 3 indexes, for example data = {indexes: [0, 1, 2]}"""
     print(f'requset: {data["indexes"]}')
     db_sess = db_session.create_session()
-    gam = db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first().game
+    gam = db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first()
     print(gam, type(gam))
-    game = json.loads(gam)
+    game = json.loads(gam.game)
     trash_cards = [game['cards'][data['indexes'][0]],
              game['cards'][data['indexes'][1]],
              game['cards'][data['indexes'][2]]]
@@ -82,29 +82,27 @@ def handler_set(data):
     game['cards'][data['indexes'][2]] = None
     if check_set.check_set(trash_cards):
         c1, c2, c3 = init_game.new_card(), init_game.new_card(), init_game.new_card()
-        copy_cards = game['cards']
+        copy_cards = game['cards'][:]
         copy_cards[data['indexes'][0]] = c1
         copy_cards[data['indexes'][1]] = c2
         copy_cards[data['indexes'][2]] = c3
-        print(c1 in (game['cards'] + game['trash-queue']))
-        while (not (c1 != c2 != c3) or (c1 in (game['cards'] + game['trash-queue']))
-                or (c2 in (game['cards'] + game['trash-queue'])) or (c3 in (game['cards'] + game['trash-queue']))
-                or not check_set_on_field.check_exist_set_on_field(copy_cards)):
+        
+        while ((not c1 != c2 != c3) or (c1 in (game['cards'] + game['trash-queue'])) or (c2 in (game['cards'] + game['trash-queue'])) or (c3 in (game['cards'] + game['trash-queue'])) or (not check_set_on_field.check_exist_set_on_field(copy_cards))):
             c1, c2, c3 = init_game.new_card(), init_game.new_card(), init_game.new_card()
+            copy_cards[data['indexes'][0]] = c1
+            copy_cards[data['indexes'][1]] = c2
+            copy_cards[data['indexes'][2]] = c3
             print(not (c1 != c2 != c3))
             print(c1 in (game['cards'] + game['trash-queue']))
             print(c2 in (game['cards'] + game['trash-queue']))
             print(c3 in (game['cards'] + game['trash-queue']))
             print(not check_set_on_field.check_exist_set_on_field(copy_cards))
-            copy_cards[data['indexes'][0]] = c1
-            copy_cards[data['indexes'][1]] = c2
-            copy_cards[data['indexes'][2]] = c3
         for i in range(3):
             game['trash-queue'].pop(0)
         game['trash-queue'] = game['trash-queue'] + trash_cards
         game['cards'] = copy_cards
+        gam.game = json.dumps(game)
         db_sess.commit()
-        print('aboba')
         emit('get_field_response', copy_cards, broadcast=True)
     else:
         emit('check_set_response', False, namespace='/set')

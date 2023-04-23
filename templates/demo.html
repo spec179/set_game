@@ -59,6 +59,7 @@
 		function render_cards(cards) {
 			for(let i = 0; i < 12; i++){
 				card = document.getElementById(`${i}`)
+				card.innerHTML = ''
 				img = document.createElement('img')
 				img.setAttribute('src', `../static/img/${cards[i]['color']}${cards[i]['fill']}${cards[i]['shape']}${cards[i]['number']}.jpg`)
 				card.appendChild(img)
