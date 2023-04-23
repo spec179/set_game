@@ -43,10 +43,18 @@ header{
     justify-content: space-evenly;
 }
 
+.bg {
+	background-color: #000;
+}
 
 .card{
 	display: flex;
     width: 20%;
+	height: 60%;
+}
+
+img{
+	width: 100%;
 	height: 100%;
 }
 

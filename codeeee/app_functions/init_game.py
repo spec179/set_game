@@ -1,7 +1,7 @@
 from random import shuffle
 import json
-from data import db_session
-from data import game as gm
+from ..data import db_session
+from ..data import game as gm
 from random import randint
 
 
@@ -21,7 +21,7 @@ def run():
     shuffle(all_cards)
     game_json = {
         "cards": [all_cards[i] for i in range(12)],
-        "trash-queue": [all_cards[i] for i in range(12, 27)]
+        "trash-queue": [all_cards[i] for i in range(12, 17)]
     }
     game = gm.Game()
     game.game = json.dumps(game_json)

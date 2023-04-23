@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
 
-    <title>Заголовок моей страницы</title>
+    <title>SET</title>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Sonsie+One" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../states/css/demo.css" >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/demo.css') }}" >
 	
   </head>
 
@@ -27,38 +27,76 @@
 					<a class="btn btn-success" href="/auth">Войти</a>
 				</p>
 			{% endif %}</li>
-            <li>Лаааадно...</li>
         </ul>
         </aside>
 		<div class="game">
 			<div class="colom1">
-				<button type="button" class="card"> Card 1</button>
-				<button type="button" class="card"> Card 2</button>
-				<button type="button" class="card"> Card 3</button>
-				<button type="button" class="card"> Card 4</button>
+				<button type="button" class="card" id="0" onclick="click_handler(0)"></button>
+				<button type="button" class="card" id="1" onclick="click_handler(1)"></button>
+				<button type="button" class="card" id="2" onclick="click_handler(2)"></button>
+				<button type="button" class="card" id="3" onclick="click_handler(3)"></button>
 			</div>
 			<div class="colom2">	
-				<button type="button" class="card"> Card 5</button>
-				<button type="button" class="card"> Card 6</button>
-				<button type="button" class="card"> Card 7</button>
-				<button type="button" class="card"> Card 8</button>
+				<button type="button" class="card" id="4" onclick="click_handler(4)"></button>
+				<button type="button" class="card" id="5" onclick="click_handler(5)"></button>
+				<button type="button" class="card" id="6" onclick="click_handler(6)"></button>
+				<button type="button" class="card" id="7" onclick="click_handler(7)"></button>
 			</div>
 			<div class="colom3">				
-				<button type="button" class="card"> Card 9</button>
-				<button type="button" class="card"> Card 10</button>
-				<button type="button" class="card"> Card 11</button>
-				<button type="button" class="card"> Card 12</button>
+				<button type="button" class="card" id="8" onclick="click_handler(8)"></button>
+				<button type="button" class="card" id="9" onclick="click_handler(9)"></button>
+				<button type="button" class="card" id="10" onclick="click_handler(10)"></button>
+				<button type="button" class="card" id="11" onclick="click_handler(11)"></button>
 			</div>
 		</div>
     </main>
-
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 	<script type="text/javascript" charset="utf-8">
-    
-		var socket = io();
+		
+		let indexes = []
+		
+		function render_cards(cards) {
+			for(let i = 0; i < 12; i++){
+				card = document.getElementById(`${i}`)
+				img = document.createElement('img')
+				img.setAttribute('src', `../static/img/${cards[i]['color']}${cards[i]['fill']}${cards[i]['shape']}${cards[i]['number']}.jpg`)
+				card.appendChild(img)
+			}
+		}
+
+		function click_handler(i) {
+			if (indexes.includes(i)){
+				return 0
+			}
+			if (indexes.length < 2) {
+				btn = document.getElementById(`${i}`)
+				btn.classList.add('bg')
+				indexes.push(i)
+				console.log(indexes)
+			} else {
+				btn1 = document.getElementById(`${indexes[0]}`)
+				btn1.classList.remove('bg')
+				btn2 = document.getElementById(`${indexes[1]}`)
+				btn2.classList.remove('bg')
+				indexes.push(i)
+				test.emit('check_set', {"indexes": indexes})
+				indexes.pop()
+				indexes.pop()
+				indexes.pop()
+			}
+		}
+
 		var test = io('/set')
+		test.on('get_field_response', function(res) {
+			render_cards(res)
+		})
 		test.on('connect', function() {
-			test.emit('check_set', {indexes: [0, 1, 2]});
+			test.emit('get_field');
 		});
+		test.on('check_set_response', function(res) {
+			console.log(res)
+		})
 		
 	</script>
 

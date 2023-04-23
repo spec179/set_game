@@ -14,6 +14,8 @@ from codeeee.data import game as gm
 
 from codeeee.app_functions import init_game, check_set, check_set_on_field
 
+import json
+
 # from .app_functions import init_game
 
 '''folowing code shoud be in code/app_functions/init_game.py'''
@@ -67,10 +69,11 @@ def load_user(user_id):
 @socketio.on('check_set', namespace='/set')
 def handler_set(data):
     """data list of 3 indexes, for example data = {indexes: [0, 1, 2]}"""
-    print(f'response: {data["indexes"]}')
+    print(f'requset: {data["indexes"]}')
     db_sess = db_session.create_session()
-    game = db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first().game
-    print(game, type(game))
+    gam = db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first().game
+    print(gam, type(gam))
+    game = json.loads(gam)
     trash_cards = [game['cards'][data['indexes'][0]],
              game['cards'][data['indexes'][1]],
              game['cards'][data['indexes'][2]]]
@@ -83,22 +86,36 @@ def handler_set(data):
         copy_cards[data['indexes'][0]] = c1
         copy_cards[data['indexes'][1]] = c2
         copy_cards[data['indexes'][2]] = c3
-        while (not (c1 != c2 != c3) or (c1 in game['cards'] + game['trash_queue'])
-                or (c1 in game['cards'] + game['trash_queue']) or (c1 in game['cards'] + game['trash_queue'])
+        print(c1 in (game['cards'] + game['trash-queue']))
+        while (not (c1 != c2 != c3) or (c1 in (game['cards'] + game['trash-queue']))
+                or (c2 in (game['cards'] + game['trash-queue'])) or (c3 in (game['cards'] + game['trash-queue']))
                 or not check_set_on_field.check_exist_set_on_field(copy_cards)):
             c1, c2, c3 = init_game.new_card(), init_game.new_card(), init_game.new_card()
+            print(not (c1 != c2 != c3))
+            print(c1 in (game['cards'] + game['trash-queue']))
+            print(c2 in (game['cards'] + game['trash-queue']))
+            print(c3 in (game['cards'] + game['trash-queue']))
+            print(not check_set_on_field.check_exist_set_on_field(copy_cards))
             copy_cards[data['indexes'][0]] = c1
             copy_cards[data['indexes'][1]] = c2
             copy_cards[data['indexes'][2]] = c3
         for i in range(3):
-            game['trash_queue'].pop(0)
-        game['trash_queue'] = game['trash_queue'] + trash_cards
+            game['trash-queue'].pop(0)
+        game['trash-queue'] = game['trash-queue'] + trash_cards
         game['cards'] = copy_cards
         db_sess.commit()
-        current_user.id
-        emit('set_response', copy_cards, broadcast=True, namespace='/set')
+        print('aboba')
+        emit('get_field_response', copy_cards, broadcast=True)
     else:
-        emit('set_response', False, namespace='/set')
+        emit('check_set_response', False, namespace='/set')
+
+
+@socketio.on('get_field', namespace='/set')
+def handler_field():
+    db_sess = db_session.create_session()
+    game = json.loads(db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first().game)
+    emit('get_field_response', game['cards'])
+
 
 
 @app.route('/', methods=['GET', 'POST'])
