@@ -27,6 +27,7 @@
 					<a class="btn btn-success" href="/auth">Войти</a>
 				</p>
 			{% endif %}</li>
+			<li id="counter"></li>
         </ul>
         </aside>
 		<div class="game">
@@ -90,7 +91,9 @@
 
 		var test = io('/set')
 		test.on('get_field_response', function(res) {
-			render_cards(res)
+			render_cards(res[0])
+			counter = document.getElementById('counter')
+			counter.innerHTML = `ВАШ СЧЁТ: ${res[1]}`
 		})
 		test.on('connect', function() {
 			test.emit('get_field');

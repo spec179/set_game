@@ -10,7 +10,7 @@ class User(SqlAlchemyBase, UserMixin):
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     login = sa.Column(sa.String, unique=True)
     hashed_password = sa.Column(sa.String)
-    count = sa.Column(sa.Integer, default=0)
+    counter = sa.Column(sa.Integer, default=0)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)

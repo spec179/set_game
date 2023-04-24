@@ -4,7 +4,7 @@ from flask import redirect
 from flask import request
 
 from flask_login import LoginManager, current_user
-from flask_login import login_user
+from flask_login import login_user, login_required, logout_user
 
 from flask_socketio import SocketIO, emit
 
@@ -72,8 +72,8 @@ def handler_set(data):
     print(f'requset: {data["indexes"]}')
     db_sess = db_session.create_session()
     gam = db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first()
-    print(gam, type(gam))
     game = json.loads(gam.game)
+    print(game)
     trash_cards = [game['cards'][data['indexes'][0]],
              game['cards'][data['indexes'][1]],
              game['cards'][data['indexes'][2]]]
@@ -102,8 +102,11 @@ def handler_set(data):
         game['trash-queue'] = game['trash-queue'] + trash_cards
         game['cards'] = copy_cards
         gam.game = json.dumps(game)
+        current_user.counter += 1
+        user = db_sess.query(users.User).filter(users.User.id == current_user.id).first()
+        user.counter = current_user.counter
         db_sess.commit()
-        emit('get_field_response', copy_cards, broadcast=True)
+        emit('get_field_response', [copy_cards, current_user.counter], broadcast=True)
     else:
         emit('check_set_response', False, namespace='/set')
 
@@ -112,7 +115,7 @@ def handler_set(data):
 def handler_field():
     db_sess = db_session.create_session()
     game = json.loads(db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first().game)
-    emit('get_field_response', game['cards'])
+    emit('get_field_response', [game['cards'], current_user.counter])
 
 
 
@@ -141,11 +144,18 @@ def login():
             return render_template('auth.html',
                                    messages=["Неправильный логин или пароль"])
 
-
+@login_required
 @app.route('/game')
 def game():
     return render_template('demo.html')
     
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
 
 def main():
     db_session.global_init('db/set.sqlite')
