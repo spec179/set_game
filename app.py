@@ -104,9 +104,13 @@ def handler_set(data):
         game['cards'] = copy_cards
         gam.game = json.dumps(game)
         user = db_sess.query(users.User).filter(users.User.id == session['id']).first()
+        # print('********')
+        # print(session['id'])
+        # print('********')
         user.counter += 1
         db_sess.commit()
-        emit('get_field_response', [copy_cards, user.counter], broadcast=True)
+        emit('get_field_response', copy_cards, broadcast=True)
+        emit('user_counter', user.counter)
     else:
         emit('check_set_response', False, namespace='/set')
 
@@ -116,7 +120,8 @@ def handler_field():
     db_sess = db_session.create_session()
     game = json.loads(db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first().game)
     user = db_sess.query(users.User).filter(users.User.id == session['id']).first()
-    emit('get_field_response', [game['cards'], user.counter])
+    emit('get_field_response', game['cards'])
+    emit('user_counter', user.counter)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -161,7 +166,7 @@ def logout():
 def main():
     db_session.global_init('db/set.sqlite')
     print(init_game.run())
-    socketio.run(app, port=8888, host='62.113.96.214')
+    socketio.run(app, port=8888, host='127.0.0.1')
 
 if __name__ == '__main__':
     main()
