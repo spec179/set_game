@@ -136,9 +136,6 @@ def handler_set(data):
         game['cards'] = copy_cards
         gam.game = json.dumps(game)
         user = db_sess.query(users.User).filter(users.User.id == session['id']).first()
-        # print('********')
-        # print(session['id'])
-        # print('********')
         print('------------------------')
         print()
         print('new field')
