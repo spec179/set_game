@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>SET</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Sonsie+One" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/demo.css') }}" >
+	
+  </head>
+
+  <body>    
+	<div id = "wrap">
+		<header>
+			<h1 class="centrtitle"> SET </h1>
+		</header>
+	</div>
+
+    <main>
+		<div class="container">
+            {% for user in us %}
+                <div class="row">
+                    <div class="name">{{ user[0] }}</div>
+                    <div class="counter">{{ user[1] }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <a href="/game">На главную</a>
+    </main>
+
+
+  </body>
+</html>

@@ -1,5 +1,8 @@
 def check_exist_set_on_field(field):
     """ field=[card, card, card...] """
+    field1 = [(c['color'], c['shape'], c['number'], c['fill']) for c in field]
+    if len(list(set(field1))) != len(field1):
+        return False
     for i in range(len(field)):
         for j in range(i + 1, len(field)):
             c1, c2 = field[i], field[j]
@@ -10,9 +13,6 @@ def check_exist_set_on_field(field):
                 'fill': 3 - c1['fill'] - c2['fill'] if c1['fill'] != c2['fill'] else c1['fill'],
             }
             if c3 in field:
-                # print(c1, c2, c3)
+                print(c1, c2, c3)
                 return True
     return False
-
-# field = [{"color": 0, "shape": 2, "number": 0, "fill": 0}, {"color": 2, "shape": 1, "number": 1, "fill": 2}, {"color": 2, "shape": 1, "number": 1, "fill": 1}, {"color": 0, "shape": 1, "number": 0, "fill": 0}, {"color": 0, "shape": 2, "number": 0, "fill": 1}, {"color": 2, "shape": 2, "number": 2, "fill": 2}, {"color": 1, "shape": 1, "number": 0, "fill": 2}, {"color": 0, "shape": 2, "number": 2, "fill": 2}, {"color": 2, "shape": 1, "number": 2, "fill": 0}, {"color": 0, "shape": 2, "number": 2, "fill": 1}, {"color": 0, "shape": 2, "number": 2, "fill": 0}, {"color": 0, "shape": 2, "number": 1, "fill": 0}]
-# print(check_set_on_field(field))

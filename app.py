@@ -7,6 +7,8 @@ from flask import session
 from flask_login import LoginManager, current_user
 from flask_login import login_user, login_required, logout_user
 
+from flask_restful import Api
+
 from flask_socketio import SocketIO, emit
 
 from codeeee.data import db_session
@@ -17,43 +19,12 @@ from codeeee.app_functions import init_game, check_set, check_set_on_field
 
 import json
 
-# from .app_functions import init_game
-
-'''folowing code shoud be in code/app_functions/init_game.py'''
-# from random import shuffle
-# import json
-# from data import db_session
-# from data import game as gm
-
-
-# def run():
-#     all_cards = []
-#     for a in range(3):
-#         for b in range(3):
-#             for c in range(3):
-#                 for d in range(3):
-#                     card = {
-#                         "color": a,
-#                         "shape": b,
-#                         "number": c,
-#                         "fill": d
-#                     }
-#                     all_cards.append(card)
-#     shuffle(all_cards)
-#     game_json = {
-#         "cards": [all_cards[i] for i in range(12)],
-#         "trash-queue": [all_cards[i] for i in range(12, 27)]
-#     }
-#     game = gm.Game()
-#     game.game = json.dumps(game_json)
-#     db_sess = db_session.create_session()
-#     db_sess.add(game)
-#     db_sess.commit()
-#     return game_json
-'''*end*'''
+from pprint import pprint
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '179supertop'
+
+api = Api(app)
 
 socketio = SocketIO(app)
 
@@ -70,11 +41,19 @@ def load_user(user_id):
 @socketio.on('check_set', namespace='/set')
 def handler_set(data):
     """data list of 3 indexes, for example data = {indexes: [0, 1, 2]}"""
+    print('--------------------------')
+    print()
     print(f'requset: {data["indexes"]}')
+    print()
+    print('--------------------------')
     db_sess = db_session.create_session()
     gam = db_sess.query(gm.Game).order_by(gm.Game.id.desc()).first()
     game = json.loads(gam.game)
-    print(game)
+    print()
+    print('--------------------------')
+    print('CARDS')
+    print('--------------------------')
+    pprint(game['cards'])
     trash_cards = [game['cards'][data['indexes'][0]],
              game['cards'][data['indexes'][1]],
              game['cards'][data['indexes'][2]]]
@@ -82,14 +61,67 @@ def handler_set(data):
     game['cards'][data['indexes'][1]] = None
     game['cards'][data['indexes'][2]] = None
     if check_set.check_set(trash_cards):
+        print('-----------------------')
+        print()
+        print('SET IS CORRECT')
+        print()
+        print('-----------------------')
         c1, c2, c3 = init_game.new_card(), init_game.new_card(), init_game.new_card()
+        print()
+        print('-----------------------')
+        print()
+        print('c1')
+        pprint(c1)
+        print()
+        print('-----------------------')
+        print()
+        print('-----------------------')
+        print()
+        print('c2')
+        pprint(c2)
+        print()
+        print('-----------------------')
+        print()
+        print('-----------------------')
+        print()
+        print('c3')
+        pprint(c3)
+        print()
+        print('-----------------------')
         copy_cards = game['cards'][:]
         copy_cards[data['indexes'][0]] = c1
         copy_cards[data['indexes'][1]] = c2
         copy_cards[data['indexes'][2]] = c3
-        
-        while ((not c1 != c2 != c3) or (c1 in (game['cards'] + game['trash-queue'])) or (c2 in (game['cards'] + game['trash-queue'])) or (c3 in (game['cards'] + game['trash-queue'])) or (not check_set_on_field.check_exist_set_on_field(copy_cards))):
+        print(not (c1 != c2 != c3))
+        print(c1 in (game['cards'] + game['trash-queue']))
+        print(c2 in (game['cards'] + game['trash-queue']))
+        print(c3 in (game['cards'] + game['trash-queue']))
+        print(not check_set_on_field.check_exist_set_on_field(copy_cards))
+        while ((not c1 != c2 != c3) or (c1 in (game['cards'] + game['trash-queue']))
+               or (c2 in (game['cards'] + game['trash-queue'])) or (c3 in (game['cards'] + game['trash-queue']))
+               or (not check_set_on_field.check_exist_set_on_field(copy_cards))):
             c1, c2, c3 = init_game.new_card(), init_game.new_card(), init_game.new_card()
+            print()
+            print('-----------------------')
+            print()
+            print('c1')
+            pprint(c1)
+            print()
+            print('-----------------------')
+            print()
+            print('-----------------------')
+            print()
+            print('c2')
+            pprint(c2)
+            print()
+            print('-----------------------')
+            print()
+            print('-----------------------')
+            print()
+            print('c3')
+            pprint(c3)
+            print()
+            print('-----------------------')
             copy_cards[data['indexes'][0]] = c1
             copy_cards[data['indexes'][1]] = c2
             copy_cards[data['indexes'][2]] = c3
@@ -107,11 +139,20 @@ def handler_set(data):
         # print('********')
         # print(session['id'])
         # print('********')
+        print('------------------------')
+        print()
+        print('new field')
+        pprint(copy_cards)
+        print('------------------------')
         user.counter += 1
         db_sess.commit()
         emit('get_field_response', copy_cards, broadcast=True)
         emit('user_counter', user.counter)
     else:
+        print()
+        print('-----------------------')
+        print()
+        print('SET IS NOT CORRECT')
         emit('check_set_response', False, namespace='/set')
 
 
@@ -161,6 +202,13 @@ def game():
 def logout():
     logout_user()
     return redirect("/")
+
+@app.route('/leader_table')
+def leader_table():
+    db_sess = db_session.create_session()
+    user = db_sess.query(users.User).all()
+    us = [(use.login, use.counter) for use in user]
+    return render_template('table_leaders.html', us = sorted(us, key=lambda x: (-x[1], x[0])))
 
 
 def main():

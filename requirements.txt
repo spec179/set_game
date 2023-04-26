@@ -2,3 +2,5 @@ flask
 flask-login
 sqlalchemy
 flask-socketio
+SQLAlchemy-serializer
+flask-restful
